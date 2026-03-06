@@ -1,3 +1,8 @@
 langchain
-langchain-core
+ipykernel
+python-dotenv
 langchain-openai
+langchain_community
+pypdf
+faiss-cpu
+-e .
