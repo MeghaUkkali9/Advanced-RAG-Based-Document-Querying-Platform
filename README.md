@@ -32,6 +32,7 @@ This folder stores metadata about the project, such as:
 1. project name
 2. version
 3. dependencies
+4. author
 
 This metadata helps pip and Python manage the package including installation, dependency tracking, and uninstallation.
 
