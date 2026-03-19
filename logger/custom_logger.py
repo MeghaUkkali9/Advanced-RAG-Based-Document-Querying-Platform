@@ -42,7 +42,7 @@ class CustomLogger:
 
         return structlog.get_logger(logger_name)
 
-if __name__ == "__main__":
-    custom_logger = CustomLogger()
-    logger = custom_logger.get_logger(__file__)
-    logger.info("custom 1111")
+# if __name__ == "__main__":
+#     custom_logger = CustomLogger()
+#     logger = custom_logger.get_logger(__file__)
+#     logger.info("custom 1111")
