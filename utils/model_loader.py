@@ -13,7 +13,6 @@ class ModelLoader:
     """
     Loads embeddings and LLM based on YAML config.
     """
-
     def __init__(self):
         load_dotenv()
         self._validate_env()
@@ -25,6 +24,8 @@ class ModelLoader:
         )
 
     def _validate_env(self):
+        """
+        Validate required environment variables for API keys."""
         required_env_vars = ["OPENAI_API_KEY", "GROQ_API_KEY"]
 
         self.api_keys = {key: os.getenv(key) for key in required_env_vars}
@@ -41,6 +42,9 @@ class ModelLoader:
         log.info("Environment variables validated")
 
     def load_embeddings(self):
+        """
+        Load embeddings based on YAML config.
+        """
         try:
             emb_config = self.config["embedding_model"]
 
@@ -63,6 +67,9 @@ class ModelLoader:
             raise DocumentQueryingPortalException(e, sys)
 
     def load_llm(self):
+        """
+        Load LLM based on active provider in YAML config.
+        """
         try:
             llm_block = self.config["llm"]
 
