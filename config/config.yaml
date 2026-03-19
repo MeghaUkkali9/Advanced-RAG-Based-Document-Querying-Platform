@@ -1,6 +1,5 @@
 faiss_db:
   collection_name: "document_portal"
-  embedding_model: "text-embedding-3-small"
 
 embedding_model:
   model_name: "text-embedding-3-small"
@@ -8,6 +7,7 @@ embedding_model:
 
 retriever:
   top_k: 5
+  search_type: "similarity"
 
 llm:
   openai:
@@ -17,10 +17,10 @@ llm:
     max_output_tokens: 1000
 
   groq:
-    model_name: "deepseek-r1-distill-llama-70b"
     provider: "groq"
+    model_name: "deepseek-r1-distill-llama-70b"
     temperature: 0
-    max_output_tokens: 1000
+    max_output_tokens: 2048
 
 active:
   llm: "openai"
