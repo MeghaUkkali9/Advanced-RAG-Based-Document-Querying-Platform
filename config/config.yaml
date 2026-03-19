@@ -1,0 +1,30 @@
+faiss_db:
+  collection_name: "document_portal"
+  embedding_model: "text-embedding-3-small"
+
+embedding_model:
+  model_name: "text-embedding-3-small"
+  provider: "openai"
+
+retriever:
+  top_k: 5
+
+llm:
+  openai:
+    model_name: "gpt-4o-mini"
+    provider: "openai"
+    temperature: 0
+    max_output_tokens: 1000
+
+  groq:
+    model_name: "deepseek-r1-distill-llama-70b"
+    provider: "groq"
+    temperature: 0
+    max_output_tokens: 1000
+
+active:
+  llm: "openai"
+
+chunking:
+  chunk_size: 500
+  chunk_overlap: 50
