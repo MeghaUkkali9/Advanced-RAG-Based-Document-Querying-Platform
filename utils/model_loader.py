@@ -5,12 +5,9 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_groq import ChatGroq
 
-from logger.custom_logger import CustomLogger
+from logger.logger_instance import logger as log
 from utils.config_loader import load_config
 from exception.custom_exception import DocumentQueryingPortalException
-
-log = CustomLogger().get_logger(__name__)
-
 
 class ModelLoader:
     """
