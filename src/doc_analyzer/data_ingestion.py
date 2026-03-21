@@ -63,20 +63,15 @@ class DataIngestion:
             log.error(f"Error saving PDF: {e}")
             raise DocumentQueryingPortalException(e, sys)
         
-    def read_pdf(self):
+    def read_pdf(self, pdf_path):
         try:
-            if not hasattr(self, "file_path") or not os.path.exists(self.file_path):
-                raise DocumentQueryingPortalException(
-                    "PDF not found. Save it first.",
-                    sys
-                )
-
-            self.document = fitz.open(self.file_path)
-
-            log.info("PDF loaded", file_path=self.file_path)
-
-            return self.document
-
+            text_chunks = []
+            with fitz.open(pdf_path) as doc:
+                for page_num, page in enumerate(doc, start=1):
+                    text_chunks.append(f"--- Page {page_num} ---\n{page.get_text()}\n")
+            text = "\n".join(text_chunks)
+            log.info("PDF read and text extracted successfully", session_id=self.session_id, pdf_path=pdf_path)
+            return text
         except Exception as e:
             log.error(f"Error loading PDF: {e}")
             raise DocumentQueryingPortalException(e, sys)
@@ -100,7 +95,7 @@ if __name__ == "__main__":
     try:
         saved_path = ingestion.save_pdf(uploaded_file)
         print(f"PDF saved at: {saved_path}")
-        
+
     except Exception as e:
         log.error(f"Test failed: {e}")
         raise DocumentQueryingPortalException("Test failed", sys)
