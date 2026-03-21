@@ -6,7 +6,7 @@ import structlog
 
 class CustomLogger:
     def __init__(self, log_dir="logs"):
-        base_dir = Path(__file__).resolve().parent
+        base_dir = Path(__file__).resolve().parents[1]
         self.log_dir = base_dir / log_dir
         os.makedirs(self.log_dir, exist_ok=True)
 
