@@ -42,6 +42,8 @@ class DataIngestion:
             raise DocumentQueryingPortalException(e, sys)
 
     def save_pdf(self, uploaded_file):
+        """
+        Saves the uploaded PDF file to the session directory."""
         try:
             filename = os.path.basename(uploaded_file.name)
 
@@ -64,6 +66,9 @@ class DataIngestion:
             raise DocumentQueryingPortalException(e, sys)
         
     def read_pdf(self, pdf_path):
+        """
+        Reads a PDF file and extracts text from it.
+        """
         try:
             text_chunks = []
             with fitz.open(pdf_path) as doc:
@@ -79,7 +84,7 @@ class DataIngestion:
 if __name__ == "__main__":
     from pathlib import Path
     from io import BytesIO
-    file_path = r"/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_analysis/Attention_is_all_you_need.pdf"
+    file_path = r"/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_analysis/Transformer.pdf"
 
     class UploadedFile:
         def __init__(self, path):
@@ -98,7 +103,7 @@ if __name__ == "__main__":
 
         read_text = ingestion.read_pdf(saved_path)
         print(f"Extracted text length: {len(read_text)} characters")
-        
+        print(f"Extracted text preview:\n{read_text[:500]}...")
     except Exception as e:
         log.error(f"Test failed: {e}")
         raise DocumentQueryingPortalException("Test failed", sys)
