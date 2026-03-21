@@ -112,19 +112,19 @@ class ModelLoader:
             log.error(f"LLM load failed: {e}")
             raise DocumentQueryingPortalException(e, sys)
 
-if __name__ == "__main__":
-    loader = ModelLoader()
+# if __name__ == "__main__":
+#     loader = ModelLoader()
 
-    # Embeddings test
-    emb = loader.load_embeddings()
-    print("Embedding loaded")
+#     # Embeddings test
+#     emb = loader.load_embeddings()
+#     print("Embedding loaded")
 
-    vec = emb.embed_query("Hello world")
-    print(f"Vector size: {len(vec)}")
+#     vec = emb.embed_query("Hello world")
+#     print(f"Vector size: {len(vec)}")
 
-    # LLM test
-    llm = loader.load_llm()
-    print("LLM loaded")
+#     # LLM test
+#     llm = loader.load_llm()
+#     print("LLM loaded")
 
-    response = llm.invoke("What is the capital of France?")
-    print(response.content)
+#     response = llm.invoke("What is the capital of France?")
+#     print(response.content)

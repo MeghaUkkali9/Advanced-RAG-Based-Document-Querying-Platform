@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
 class MetaData(BaseModel):
     Summary: List[str] = Field(..., description="A list of summary sentences extracted from the document.")
@@ -8,5 +8,6 @@ class MetaData(BaseModel):
     DateCreated: str
     LastModified: str
     Publisher: str
-    PageCount: int
-    Sentiment: str
+    Language: str
+    PageCount: Union[int, str]
+    SentimentTone: str

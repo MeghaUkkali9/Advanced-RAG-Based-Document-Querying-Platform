@@ -26,8 +26,18 @@ def main():
         print(f"Extracted text length: {len(read_text)} characters")
         print(f"Extracted text preview:\n{read_text[:500]}...")
 
+        analyzer = DataAnalyzer()
+        analysis_result = analyzer.analyze_document(read_text)
+        print(f"Document analysis result: {analysis_result}")
+
+        print("Test completed successfully.")
+        print("\n ==========Metadata Extracted==========")
+        for key, value in analysis_result.items():
+            print(f"{key}: {value}")
 
     except Exception as e:
         print(f"Test failed: {e}")
         raise Exception("Test failed") from e
 
+if __name__ == "__main__":
+    main()

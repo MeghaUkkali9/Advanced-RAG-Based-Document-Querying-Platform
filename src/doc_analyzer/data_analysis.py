@@ -6,16 +6,15 @@ from exception.custom_exception import DocumentQueryingPortalException
 from model.models import *
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.output_parsers import OutputFixingParser
-
 from prompt.prompt_library import prompt
 class DataAnalyzer:
     """
     Analyzes documents using a pre-trained model and parses the output.
     """ 
-    def __init__(self, data: dict):
+    def __init__(self):
         try:
             self.loader = ModelLoader()
-            self.llm = self.loader.llm
+            self.llm = self.loader.load_llm()
 
             self.parser = JsonOutputParser(pydantic_object=MetaData)
             self.fixing_parser = OutputFixingParser.from_llm(llm=self.llm, parser=self.parser)
