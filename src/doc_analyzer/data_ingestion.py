@@ -96,6 +96,9 @@ if __name__ == "__main__":
         saved_path = ingestion.save_pdf(uploaded_file)
         print(f"PDF saved at: {saved_path}")
 
+        read_text = ingestion.read_pdf(saved_path)
+        print(f"Extracted text length: {len(read_text)} characters")
+        
     except Exception as e:
         log.error(f"Test failed: {e}")
         raise DocumentQueryingPortalException("Test failed", sys)
