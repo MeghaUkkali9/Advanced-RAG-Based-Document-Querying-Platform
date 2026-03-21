@@ -1,16 +1,12 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 
-class Document(BaseModel):
-    id: str
-    content: str
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-
-class Query(BaseModel):
-    query: str
-    filters: Optional[Dict[str, Any]] = None
-    sort: Optional[List[str]] = None
-
-class Response(BaseModel):
-    documents: List[Document]
-    total: int
+class MetaData(BaseModel):
+    Summary: List[str] = Field(..., description="A list of summary sentences extracted from the document.")
+    Title: str
+    Author: str
+    DateCreated: str
+    LastModified: str
+    Publisher: str
+    PageCount: int
+    Sentiment: str
