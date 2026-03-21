@@ -1,43 +1,101 @@
 import os
-import fitz
+import sys
+import fitz 
 import uuid
 from datetime import datetime
+from pathlib import Path
 
 from logger.logger_instance import logger as log
 from exception.custom_exception import DocumentQueryingPortalException
 
+
 class DataIngestion:
     """
-    Handles PDF saving and reading operations.
+    Handles PDF saving, reading, and text extraction.
     """
-    def __init__(self, file_path: str):
-        self.file_path = file_path
-        self.document = None
-    
-    def save_pdf(self, content: bytes):
-        pass
 
-    def load_pdf(self):
+    def __init__(self, data_dir=None, session_id=None):
         try:
-            with open(self.file_path, "rb") as f:
-                self.document = fitz.open(f)
-            log.info(f"PDF loaded successfully: {self.file_path}")
+            base_dir = Path(__file__).resolve().parent
+
+            data_dir = data_dir or os.getenv(
+                "DATA_STORAGE_DIR",
+                os.path.join(base_dir,"data", "document_analysis")
+            )
+
+            self.session_id = session_id or (
+                f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}_"
+                f"{uuid.uuid4().hex[:8]}"
+            )
+
+            self.session_path = os.path.join(data_dir, self.session_id)
+            os.makedirs(self.session_path, exist_ok=True)
+
+            log.info(
+                "DataIngestion initialized",
+                session_id=self.session_id,
+                session_path=self.session_path
+            )
+
+        except Exception as e:
+            log.error(f"Error initializing DataIngestion: {e}")
+            raise DocumentQueryingPortalException(e, sys)
+
+    def save_pdf(self, uploaded_file):
+        try:
+            filename = os.path.basename(uploaded_file.name)
+
+            if not filename.lower().endswith(".pdf"):
+                raise DocumentQueryingPortalException(
+                    "Invalid file type. Only PDFs are allowed.",
+                    sys
+                )
+            
+            save_path = os.path.join(self.session_path, filename)
+
+            with open(save_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+
+            log.info("PDF saved successfully", file=filename, file_path=save_path, session_id=self.session_id)
+            return save_path
+
+        except Exception as e:
+            log.error(f"Error saving PDF: {e}")
+            raise DocumentQueryingPortalException(e, sys)
+        
+    def read_pdf(self):
+        try:
+            if not hasattr(self, "file_path") or not os.path.exists(self.file_path):
+                raise DocumentQueryingPortalException(
+                    "PDF not found. Save it first.",
+                    sys
+                )
+
+            self.document = fitz.open(self.file_path)
+
+            log.info("PDF loaded", file_path=self.file_path)
+
+            return self.document
+
         except Exception as e:
             log.error(f"Error loading PDF: {e}")
-            raise DocumentQueryingPortalException("Failed to load PDF")
+            raise DocumentQueryingPortalException(e, sys)
 
-    def extract_text(self):
-        if not self.document:
-            log.warning("Document not loaded")
-            return ""
+if __name__ == "__main__":
 
-        text = ""
-        for page in self.document:
-            text += page.get_text()
-        log.info("Text extracted successfully")
-        return text
+    from pathlib import Path
 
-    def close_document(self):
-        if self.document:
-            self.document.close()
-            log.info("Document closed successfully")
+    file_path = r"/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_analysis/Attention_is_all_you_need.pdf"
+
+    class UploadedFile:
+        def __init__(self, path):
+            self.name = Path(path).name
+            self._file_path = path
+
+        def getbuffer(self):
+            return open(self._file_path, "rb").read()
+
+    uploaded_file = UploadedFile(file_path)
+
+    ingestion = DataIngestion(session_id="test_session")
+    saved_path = ingestion.save_pdf(uploaded_file)
