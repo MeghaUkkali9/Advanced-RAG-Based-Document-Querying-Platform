@@ -28,22 +28,19 @@ class DataAnalyzer:
             log.error(f"Error initializing DataAnalyzer: {e}")
             raise DocumentQueryingPortalException("Failed to initialize DataAnalyzer", sys)
 
-    def analyze_metadata(self, document_path: str):
+    def analyze_document(self, document_text: str) -> dict:
         try:
-            # Load the model
-            model = self.model_loader.load_model("data-analyzer")
-            log.info("Model loaded successfully")
+            chain = self.prompt | self.llm | self.fixing_parser
+            log.info(f"Analyzing document: {document_text[:100]}...") 
 
-            # Analyze the data
-            results = model.analyze(document_path)
-            log.info("Data analyzed successfully")
+            response = chain.invoke({
+                "format_instructions": self.parser.get_format_instructions(),
+                "document_text": document_text
+            })
 
-            # Parse the output
-            parsed_results = self.fixing_parser.parse(results)
-            log.info("Output parsed successfully")
-
-            return parsed_results
+            log.info(f"Document analysis completed successfully: {response}")
+            return response
         
         except Exception as e:
-            log.error(f"Error analyzing data: {e}")
-            raise DocumentQueryingPortalException("Failed to analyze data")
+            log.error(f"Error analyzing document: {e}")
+            raise DocumentQueryingPortalException("Failed to analyze document", sys)
