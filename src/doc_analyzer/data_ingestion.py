@@ -20,7 +20,7 @@ class DataIngestion:
 
             data_dir = data_dir or os.getenv(
                 "DATA_STORAGE_DIR",
-                os.path.join(base_dir,"data", "document_analysis")
+                os.path.join(os.getcwd(), "data", "document_analysis")
             )
 
             self.session_id = session_id or (
@@ -82,9 +82,8 @@ class DataIngestion:
             raise DocumentQueryingPortalException(e, sys)
 
 if __name__ == "__main__":
-
     from pathlib import Path
-
+    from io import BytesIO
     file_path = r"/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_analysis/Attention_is_all_you_need.pdf"
 
     class UploadedFile:
@@ -98,4 +97,10 @@ if __name__ == "__main__":
     uploaded_file = UploadedFile(file_path)
 
     ingestion = DataIngestion(session_id="test_session")
-    saved_path = ingestion.save_pdf(uploaded_file)
+    try:
+        saved_path = ingestion.save_pdf(uploaded_file)
+        print(f"PDF saved at: {saved_path}")
+        
+    except Exception as e:
+        log.error(f"Test failed: {e}")
+        raise DocumentQueryingPortalException("Test failed", sys)
