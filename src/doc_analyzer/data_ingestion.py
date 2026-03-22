@@ -81,29 +81,29 @@ class DataIngestion:
             log.error(f"Error loading PDF: {e}")
             raise DocumentQueryingPortalException(e, sys)
 
-if __name__ == "__main__":
-    from pathlib import Path
-    from io import BytesIO
-    file_path = r"/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_analysis/Transformer.pdf"
+# if __name__ == "__main__":
+#     from pathlib import Path
+#     from io import BytesIO
+#     file_path = r"/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_analysis/Transformer.pdf"
 
-    class UploadedFile:
-        def __init__(self, path):
-            self.name = Path(path).name
-            self._file_path = path
+#     class UploadedFile:
+#         def __init__(self, path):
+#             self.name = Path(path).name
+#             self._file_path = path
 
-        def getbuffer(self):
-            return open(self._file_path, "rb").read()
+#         def getbuffer(self):
+#             return open(self._file_path, "rb").read()
 
-    uploaded_file = UploadedFile(file_path)
+#     uploaded_file = UploadedFile(file_path)
 
-    ingestion = DataIngestion(session_id="test_session")
-    try:
-        saved_path = ingestion.save_pdf(uploaded_file)
-        print(f"PDF saved at: {saved_path}")
+#     ingestion = DataIngestion(session_id="test_session")
+#     try:
+#         saved_path = ingestion.save_pdf(uploaded_file)
+#         print(f"PDF saved at: {saved_path}")
 
-        read_text = ingestion.read_pdf(saved_path)
-        print(f"Extracted text length: {len(read_text)} characters")
-        print(f"Extracted text preview:\n{read_text[:500]}...")
-    except Exception as e:
-        log.error(f"Test failed: {e}")
-        raise DocumentQueryingPortalException("Test failed", sys)
+#         read_text = ingestion.read_pdf(saved_path)
+#         print(f"Extracted text length: {len(read_text)} characters")
+#         print(f"Extracted text preview:\n{read_text[:500]}...")
+#     except Exception as e:
+#         log.error(f"Test failed: {e}")
+#         raise DocumentQueryingPortalException("Test failed", sys)

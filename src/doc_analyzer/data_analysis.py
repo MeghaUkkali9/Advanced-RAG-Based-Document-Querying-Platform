@@ -7,6 +7,7 @@ from model.models import *
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.output_parsers import OutputFixingParser
 from prompt.prompt_library import prompt
+
 class DataAnalyzer:
     """
     Analyzes documents using a pre-trained model and parses the output.
