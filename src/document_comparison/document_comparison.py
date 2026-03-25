@@ -28,18 +28,28 @@ class DocumentComparator:
 
         log.info("DocumentComparator initialized successfully")
 
-    def compare_documents(self):
+    def compare_documents(self, combined_docs:str):
         """Compare the two documents and return the differences."""
         try:
-            pass
+            input_data = {
+                "combined_document": combined_docs,
+                "format_instruction": self.parser.get_format_instructions()
+            }
+
+            log.info("Comparing documents using LLM...")
+            response = self.chain.invoke(input_data)
+            log.info("Document comparison completed successfully")
+            return self._format_response(response)
         except Exception as e:
             log.error(f"Error comparing documents: {e}")
             raise DocumentQueryingPortalException("Failed to compare documents", sys)
 
-    def _format_response(self):
+    def _format_response(self, response:list[dict]) -> pd.DataFrame:
         """Format the response from the LLM to be user-friendly."""
         try:
-            pass
+            df = pd.DataFrame(response)
+            log.info("Response formatted successfully")
+            return df
         except Exception as e:
             log.error(f"Error formatting response: {e}")
             raise DocumentQueryingPortalException("Failed to format response", sys)
