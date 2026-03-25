@@ -17,19 +17,42 @@ class DataIngestionForDocumentComparison:
     def delete_existing_files(self):
         """Delete existing files in the specfied directory."""
         try:
-            pass
+            if self.base_directory.exists() and self.base_directory.is_dir():
+                for file in self.base_directory.iterdir():
+                    if file.is_file():
+                        file.unlink()
+                        log.info(f"Deleted existing file: {file}")
+            else:
+                log.warning(f"Base directory does not exist or is not a directory: {self.base_directory}")
         except Exception as e:
             log.error(f"Error deleting existing files: {e}")
             raise DocumentQueryingPortalException("Failed to delete existing files", sys)
 
-    def save_uploaded_files(self):
+    def save_uploaded_files(self, reference_file, actual_file):
         """Save uploaded files to the specified directory."""
         try:
-            pass
+            self.delete_existing_files()
+            log.info("Saving uploaded files...")
+
+            reference_path=self.base_directory / reference_file.name
+            actual_path=self.base_directory / actual_file.name
+
+            if not reference_file.name.endswith('.pdf') or not actual_file.name.endswith('.pdf'):
+                log.warning("One or both uploaded files are not PDFs")
+                raise ValueError("Both uploaded files must be PDFs")
+            
+            with open(reference_path, 'wb') as ref_file:
+                ref_file.write(reference_file.getbuffer())
+            log.info(f"Reference file saved successfully: {reference_path}")
+
+            with open(actual_path, 'wb') as act_file:
+                act_file.write(actual_file.getbuffer())
+            log.info(f"Actual file saved successfully: {actual_path}")
+
         except Exception as e:
             log.error(f"Error saving uploaded files: {e}")
-            raise DocumentQueryingPortalException("Failed to save uploaded files", sys)
-
+            raise DocumentQueryingPortalException("Failed to save uploaded files", sys) 
+        
     def read_pdf(self, pdf_path):
         """Read the contents of a PDF file."""
         try:
