@@ -7,7 +7,7 @@ from logger.custom_logger import logger as log
 from exception.custom_exception import DocumentQueryingPortalException
 
 class DataIngestionForDocumentComparison:
-    def __init__(self, base_directory):
+    def __init__(self, base_directory:str="data/document_compare"):
         log.info("Initializing DataIngestionForDocumentComparison...")
 
         self.base_directory = Path(base_directory)
@@ -76,3 +76,23 @@ class DataIngestionForDocumentComparison:
         except Exception as e:
             log.error(f"Error reading PDF file: {e}")
             raise DocumentQueryingPortalException("Failed to read PDF file", sys)
+        
+    def combine_documents(self):
+        """Combine the contents of the reference and actual documents."""
+        try:
+            content_dict = {}
+            doc_parts = []
+
+            for filename in sorted(self.base_directory.iterdir()):
+                if filename.is_file() and filename.suffix == '.pdf':
+                    content_dict[filename.name] = self.read_pdf(filename)
+            
+            for filename, content in content_dict.items():
+                doc_parts.append(f"Document: {filename}-{content}\n")
+            
+            combined_content = "\n".join(doc_parts)
+            log.info("Documents combined successfully")
+            return combined_content
+        except Exception as e:
+            log.error(f"Error combining documents: {e}")
+            raise DocumentQueryingPortalException("Failed to combine documents", sys)
