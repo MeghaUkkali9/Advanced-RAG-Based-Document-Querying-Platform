@@ -6,7 +6,7 @@ from exception.custom_exception import DocumentQueryingPortalException
 from model.models import *
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.output_parsers import OutputFixingParser
-from prompt.prompt_library import prompt
+from prompt.prompt_library import PROMPT_REGISTRY
 
 class DataAnalyzer:
     """
@@ -20,7 +20,7 @@ class DataAnalyzer:
             self.parser = JsonOutputParser(pydantic_object=MetaData)
             self.fixing_parser = OutputFixingParser.from_llm(llm=self.llm, parser=self.parser)
 
-            self.prompt = prompt
+            self.prompt = PROMPT_REGISTRY["document_analysis"]
 
             log.info("DataAnalyzer initialized successfully")
 
