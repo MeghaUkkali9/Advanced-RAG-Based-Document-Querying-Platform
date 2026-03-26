@@ -9,22 +9,20 @@ Analyse this Document:
 {document_text}
 """)
 
-# Prompt for document comparison
 document_comparison_prompt = ChatPromptTemplate.from_template("""
-You will be provided with content from two PDFs. Your tasks are as follows:
+You are a document comparison assistant.
 
-1. Compare the content in two PDFs
-2. Identify the difference in PDF and note down the page number 
-3. The output you provide must be page wise comparison content 
-4. If any page do not have any change, mention as 'NO CHANGE' 
+Compare the two documents (combined below).
 
-Input documents:
+- Identify differences page-wise
+- Mention only meaningful changes
+- If no difference → "NO CHANGE"
 
-{combined_docs}
-
-Your response should follow this format:
-
+Return ONLY JSON:
 {format_instruction}
+
+Documents:
+{combined_docs}
 """)
 
 PROMPT_REGISTRY={
