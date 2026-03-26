@@ -14,7 +14,8 @@ class MetaData(BaseModel):
 
 class ChangeFormat(BaseModel):
     Page: str
-    changes: str
+    added: List[str]
+    deleted: List[str]
 
 class SummaryResponse(RootModel[list[ChangeFormat]]): 
     pass

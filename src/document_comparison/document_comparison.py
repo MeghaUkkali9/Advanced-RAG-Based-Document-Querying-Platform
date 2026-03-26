@@ -34,8 +34,8 @@ class DocumentComparator:
         """Compare the two documents and return the differences."""
         try:
             input_data = {
-                "combined_docs": combined_docs,
-                "format_instruction": self.parser.get_format_instructions()
+                "combined_document": combined_docs,
+                "format_instructions": self.parser.get_format_instructions()
             }
 
             log.info("Comparing documents using LLM...")

@@ -78,8 +78,8 @@ def test_compare_documents():
 
     llm_comparator = DocumentComparator()
     comparison_result = llm_comparator.compare_documents(combined_docs)
-    print("Comparison result:")
-    print(comparison_result.head())  # Print the first few rows of the comparison result
+    print("\nComparison result:")
+    print(comparison_result.to_dict(orient='records'))  # Print the first few rows of the comparison result
 
 if __name__ == "__main__":
         test_compare_documents()
