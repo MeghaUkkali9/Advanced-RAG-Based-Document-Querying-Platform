@@ -10,19 +10,19 @@ Analyse this Document:
 """)
 
 document_comparison_prompt = ChatPromptTemplate.from_template("""
-You are a document comparison assistant.
-
-Compare the two documents (combined below).
+Compare two documents (combined below).
 
 - Identify differences page-wise
-- Mention only meaningful changes
-- If no difference → "NO CHANGE"
+- Separate into:
+  - added (present in actual, not in reference)
+  - deleted (present in reference, not in actual)
+- If no change → "NO CHANGE"
 
 Return ONLY JSON:
-{format_instruction}
+{format_instructions}
 
 Documents:
-{combined_docs}
+{combined_document}
 """)
 
 PROMPT_REGISTRY={
