@@ -3,9 +3,12 @@ import os
 from pathlib import Path
 import fitz
 
-from logger.custom_logger import logger as log
 from exception.custom_exception import DocumentQueryingPortalException
+from logger.custom_logger import CustomLogger
 
+log = CustomLogger().get_logger(__name__)
+
+log.info("This works perfectly")
 class DataIngestionForDocumentComparison:
     def __init__(self, base_directory:str="data/document_compare"):
         log.info("Initializing DataIngestionForDocumentComparison...")
@@ -49,6 +52,7 @@ class DataIngestionForDocumentComparison:
                 act_file.write(actual_file.getbuffer())
             log.info(f"Actual file saved successfully: {actual_path}")
 
+            return reference_path, actual_path
         except Exception as e:
             log.error(f"Error saving uploaded files: {e}")
             raise DocumentQueryingPortalException("Failed to save uploaded files", sys) 
@@ -56,7 +60,7 @@ class DataIngestionForDocumentComparison:
     def read_pdf(self, pdf_path):
         """Read the contents of a PDF file."""
         try:
-            with fitz.open(self, pdf_path) as doc:
+            with fitz.open(pdf_path) as doc:
                 if doc.is_encrypted:
                     log.warning(f"PDF file is encrypted: {pdf_path}")
                     raise ValueError("PDF file is encrypted", pdf_path)

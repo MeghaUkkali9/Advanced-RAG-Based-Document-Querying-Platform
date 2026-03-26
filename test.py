@@ -54,8 +54,8 @@ def load_test_files(file_path: Path):
 
 def test_compare_documents():
    
-    reference_file = Path("/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_comparison/reference.pdf")
-    actual_file = Path("/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_comparison/actual.pdf")
+    reference_file = Path("/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_compare/reference.pdf")
+    actual_file = Path("/Users/meghaukkali/Documents/Advanced-RAG-Based-Document-Querying-Platform/data/document_compare/actual.pdf")
     
     class TestFile:
         def __init__(self, file_path):
@@ -81,5 +81,5 @@ def test_compare_documents():
     print("Comparison result:")
     print(comparison_result.head())  # Print the first few rows of the comparison result
 
-    if __name__ == "__main__":
+if __name__ == "__main__":
         test_compare_documents()

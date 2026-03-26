@@ -2,7 +2,7 @@ import sys
 from dotenv import load_dotenv
 import pandas as pd
 
-from logger.custom_logger import logger as log
+from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentQueryingPortalException
 from model.models import *
 from prompt.prompt_library import PROMPT_REGISTRY
@@ -11,12 +11,14 @@ from utils.model_loader import ModelLoader
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.output_parsers import OutputFixingParser
 
+log = CustomLogger().get_logger(__name__)
+
 class DocumentComparator:
     def __init__(self):
         load_dotenv()
         log.info("Initializing DocumentComparator...")
         self.loader = ModelLoader()
-        self.llm = self.loader.load_model()
+        self.llm = self.loader.load_llm()
         self.parser = JsonOutputParser(pydantic_object=SummaryResponse)
         self.output_parser = OutputFixingParser.from_llm(
             llm=self.llm,
@@ -32,7 +34,7 @@ class DocumentComparator:
         """Compare the two documents and return the differences."""
         try:
             input_data = {
-                "combined_document": combined_docs,
+                "combined_docs": combined_docs,
                 "format_instruction": self.parser.get_format_instructions()
             }
 
