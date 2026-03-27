@@ -38,7 +38,6 @@ class ConversationalRetrieval:
                 self.qa_chain
             )
             self.log.info("Ceated RAG Chain", session_id = session_id)
-            self.store = {}
             self.chain = RunnableWithMessageHistory(
                 self.rag_chain,
                 self._get_session_history,
