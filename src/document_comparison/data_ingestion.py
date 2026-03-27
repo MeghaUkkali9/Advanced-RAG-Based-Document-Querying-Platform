@@ -2,6 +2,9 @@ import sys
 import os
 from pathlib import Path
 import fitz
+import shutil
+from datetime import datetime
+import uuid
 
 from exception.custom_exception import DocumentQueryingPortalException
 from logger.custom_logger import CustomLogger
@@ -10,12 +13,17 @@ log = CustomLogger().get_logger(__name__)
 
 log.info("This works perfectly")
 class DataIngestionForDocumentComparison:
-    def __init__(self, base_directory:str="data/document_compare"):
+    def __init__(self, base_directory:str="data/document_compare", session_id:str=None):
         log.info("Initializing DataIngestionForDocumentComparison...")
 
         self.base_directory = Path(base_directory)
         self.base_directory.mkdir(parents=True, exist_ok=True)
         log.info(f"Base directory set to: {self.base_directory}")
+
+        self.session_id = session_id or f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
+        self.session_path = self.base_directory / self.session_id
+        self.session_path.mkdir(parents=True, exist_ok=True)
+        log.info(f"Session initialized with ID: {self.session_id} at path: {self.session_path}")
 
     def delete_existing_files(self):
         """Delete existing files in the specfied directory."""
@@ -37,8 +45,8 @@ class DataIngestionForDocumentComparison:
             self.delete_existing_files()
             log.info("Saving uploaded files...")
 
-            reference_path=self.base_directory / reference_file.name
-            actual_path=self.base_directory / actual_file.name
+            reference_path=self.session_path / reference_file.name
+            actual_path=self.session_path / actual_file.name
 
             if not reference_file.name.endswith('.pdf') or not actual_file.name.endswith('.pdf'):
                 log.warning("One or both uploaded files are not PDFs")
@@ -100,3 +108,16 @@ class DataIngestionForDocumentComparison:
         except Exception as e:
             log.error(f"Error combining documents: {e}")
             raise DocumentQueryingPortalException("Failed to combine documents", sys)
+        
+    def clean_old_sessions(self, keep_latest: int = 3):
+        try:
+            sessions = sorted(
+                [f for f in self.base_dir.iterdir() if f.is_dir()], 
+                reverse=True)
+            
+            for folder in sessions[keep_latest:]:
+                shutil.rmtree(folder, ignore_errors=True)
+                log.info("Old session folder deleted", path=str(folder))
+        except Exception as e:
+            log.error("Error cleaning old sessions", error=str(e))
+            raise DocumentQueryingPortalException("Error cleaning old sessions", e) from e
