@@ -69,14 +69,15 @@ def test_compare_documents():
 
     ref_file, actual_file = comparator.save_uploaded_files(ref_upload, actual_upload)
     combined_docs = comparator.combine_documents()
-
+    comparator.clean_old_sessions()
+    
     print("Combined document content preview:")
-    print(combined_docs[:1000])  # Print the first 1000 characters of
+    print(combined_docs[:1000]) 
 
     llm_comparator = DocumentComparator()
     comparison_result = llm_comparator.compare_documents(combined_docs)
     print("\nComparison result:")
-    print(comparison_result.to_dict(orient='records'))  # Print the first few rows of the comparison result
-
+    print(comparison_result.to_dict(orient='records')) 
+    
 if __name__ == "__main__":
         test_compare_documents()
