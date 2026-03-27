@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_community.vectorstores import FAISS
-from langchain_core.runnables.history import RunnableChatMessageHistory
-from langchain.chains import create_history_aware_retriever, create_retrival_chain
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
 from logger.custom_logger import CustomLogger
@@ -32,14 +32,17 @@ class ConversationalRetrieval:
             )
             self.log.info("Created history-aware reteiever", session_id= session_id)
             self.qa_chain = create_stuff_documents_chain(self.llm, self.qa_prompt)
-            self.rag_chain = create_retrival_chain(self.history_aware_retriever, self.qa_chain)
+            self.rag_chain = create_retrieval_chain(
+                self.history_aware_retriever,
+                self.qa_chain
+            )
             self.log.info("Ceated RAG Chain", session_id = session_id)
-
-            self.chain = RunnableChatMessageHistory(
+            self.store = {}
+            self.chain = RunnableWithMessageHistory(
                 self.rag_chain,
                 self._get_session_history,
                 input_messages_key="input",
-                history_massages_key = "chat_history",
+                history_messages_key="chat_history",
                 output_messages_key = "answer"
             )
             self.log.info("Created RunnableWithMessageHistory", session_id=session_id)
@@ -56,9 +59,11 @@ class ConversationalRetrieval:
             self.log.error(f"Error loading LLM: {e}")
             raise DocumentQueryingPortalException("Failed to load LLM", sys)
     
-    def _get_session_history(self):
+    def _get_session_history(self, session_id: str) -> BaseChatMessageHistory:
         try:
-            pass
+            if session_id not in self.store:
+                self.store[session_id] = ChatMessageHistory()
+                return self.store[session_id]
         except Exception as e:
             self.log.error(f"Error getting session history: {e}")
             raise DocumentQueryingPortalException("Failed to get session history", sys)
@@ -82,7 +87,7 @@ class ConversationalRetrieval:
         try:
             response = self.chain.invoke(
                 {"input": user_input},
-                config = {{"configurable": {"session_id": self.session_id}}})
+                config = {"configurable": {"session_id": self.session_id}})
             answer = response.get("answer", "No answer")
 
             if not answer:

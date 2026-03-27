@@ -29,7 +29,7 @@ class SingleDocIngestor:
             documents = []
 
             for uploaded_file in uploaded_files:
-                unique_filename = f"session_{datetime.now().strftime("%Y%m%d_%H%M%S")}_{uuid.uuid4().hex[:8]}.pdf"
+                unique_filename = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
                 temp_path = self.data_dir / unique_filename
 
                 with open(temp_path, "wb") as f:

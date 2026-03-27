@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, RootModel
-from typing import Optional, List, Dict, Any, Union, Enum
+from typing import Optional, List, Dict, Any, Union
+from enum import Enum
 
 class MetaData(BaseModel):
     Summary: List[str] = Field(..., description="A list of summary sentences extracted from the document.")
