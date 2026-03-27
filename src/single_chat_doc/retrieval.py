@@ -7,6 +7,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+import streamlit as st
 
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentQueryingPortalException
@@ -61,9 +62,14 @@ class ConversationalRetrieval:
     
     def _get_session_history(self, session_id: str) -> BaseChatMessageHistory:
         try:
-            if session_id not in self.store:
-                self.store[session_id] = ChatMessageHistory()
-                return self.store[session_id]
+            if "store" not in st.session_state:
+                st.session_state.store = {}
+
+            if session_id not in st.session_state.store:
+                st.session_state.store[session_id] = ChatMessageHistory()
+
+            return st.session_state.store[session_id]
+
         except Exception as e:
             self.log.error(f"Error getting session history: {e}")
             raise DocumentQueryingPortalException("Failed to get session history", sys)
