@@ -20,7 +20,7 @@ class DataAnalyzer:
             self.parser = JsonOutputParser(pydantic_object=MetaData)
             self.fixing_parser = OutputFixingParser.from_llm(llm=self.llm, parser=self.parser)
 
-            self.prompt = PROMPT_REGISTRY["document_analysis"]
+            self.prompt = PROMPT_REGISTRY[PromptType.DOCUMENT_ANALYSIS]
 
             log.info("DataAnalyzer initialized successfully")
 
