@@ -23,7 +23,7 @@ class ConversationalRetrieval:
             self.model_loader = ModelLoader()
             self.session_id = session_id
             self.retriever = retriever
-            self.llm = self._load_llm()
+            self.llm = self.__load_llm()
             self.contextualize_prompt = PROMPT_REGISTRY[PromptType.CONTEXTUALIZE_QUERY.value]
             self.qa_prompt = PROMPT_REGISTRY[PromptType.CONTEXT_QUERY_ANSWERING.value]
             self.history_aware_retriever = create_history_aware_retriever(
@@ -40,7 +40,7 @@ class ConversationalRetrieval:
             self.log.info("Ceated RAG Chain", session_id = session_id)
             self.chain = RunnableWithMessageHistory(
                 self.rag_chain,
-                self._get_session_history,
+                self.__get_session_history,
                 input_messages_key="input",
                 history_messages_key="chat_history",
                 output_messages_key = "answer"
@@ -50,7 +50,7 @@ class ConversationalRetrieval:
             self.log.error(f"Error initializing ConversationalRetrieval: {e}")
             raise DocumentQueryingPortalException("Failed to initialize ConversationalRetrieval", sys) from e
 
-    def _load_llm(self):
+    def __load_llm(self):
         try:
             llm = ModelLoader().load_llm()
             self.log.info("LLM loaded successfully", class_name=llm.__class__.__name__)
@@ -59,7 +59,7 @@ class ConversationalRetrieval:
             self.log.error(f"Error loading LLM: {e}")
             raise DocumentQueryingPortalException("Failed to load LLM", sys)
     
-    def _get_session_history(self, session_id: str) -> BaseChatMessageHistory:
+    def __get_session_history(self, session_id: str) -> BaseChatMessageHistory:
         try:
             if "store" not in st.session_state:
                 st.session_state.store = {}

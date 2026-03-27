@@ -41,12 +41,12 @@ class SingleDocIngestor:
                 documents.extend(docs)
             self.log.info("PDF files loaded", count=len(documents))
 
-            return self._create_retriever(documents)
+            return self.__create_retriever(documents)
         except Exception as e:
             self.log.error(f"Error ingesting document: {e}")
             raise DocumentQueryingPortalException("Failed to ingest document", sys)
         
-    def _create_retriever(self, documents):
+    def __create_retriever(self, documents):
         try:
             spiltter = RecursiveCharacterTextSplitter(
                 chunk_size = 1000,
