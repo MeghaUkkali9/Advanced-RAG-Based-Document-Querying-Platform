@@ -13,13 +13,16 @@ class SingleDocIngestor:
     def __init__(self, data_dir:str = "data/single_doc_chat", faiss_dir: str = "faiss_index"):
         try:
             self.log = CustomLogger().get_logger(__name__)
+
             self.data_dir = Path(data_dir)
             self.data_dir.mkdir(parents=True, exist_ok=True)
+
             self.faiss_dir = Path(faiss_dir)
             self.faiss_dir.mkdir(parents=True, exist_ok=True)
 
             self.model_loader = ModelLoader()
             self.log.info("SingleDocIngestor Initialized", temp_path=str(self.data_dir), faiss_dir=str(self.faiss_dir))
+            
         except Exception as e:
             self.log("Failed to intialize singleDoc Ingestor", error=str(e))
             raise DocumentQueryingPortalException("Initialization error in SingleDocIngestor", sys)

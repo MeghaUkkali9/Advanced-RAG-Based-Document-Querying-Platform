@@ -49,30 +49,7 @@ class ConversationalRetrieval:
         except Exception as e:
             self.log.error(f"Error initializing ConversationalRetrieval: {e}")
             raise DocumentQueryingPortalException("Failed to initialize ConversationalRetrieval", sys) from e
-
-    def __load_llm(self):
-        try:
-            llm = ModelLoader().load_llm()
-            self.log.info("LLM loaded successfully", class_name=llm.__class__.__name__)
-            return llm
-        except Exception as e:
-            self.log.error(f"Error loading LLM: {e}")
-            raise DocumentQueryingPortalException("Failed to load LLM", sys)
-    
-    def __get_session_history(self, session_id: str) -> BaseChatMessageHistory:
-        try:
-            if "store" not in st.session_state:
-                st.session_state.store = {}
-
-            if session_id not in st.session_state.store:
-                st.session_state.store[session_id] = ChatMessageHistory()
-
-            return st.session_state.store[session_id]
-
-        except Exception as e:
-            self.log.error(f"Error getting session history: {e}")
-            raise DocumentQueryingPortalException("Failed to get session history", sys)
-
+        
     def load_retriever_from_faiss(self, index_path:str):
         try:
             embeddings = ModelLoader().load_embeddings()
@@ -104,3 +81,27 @@ class ConversationalRetrieval:
             self.log.error(f"Error invoking conversational retrieval: {e}")
             raise DocumentQueryingPortalException("Failed to invoke conversational retrieval", sys) 
         
+    def __load_llm(self):
+        try:
+            llm = ModelLoader().load_llm()
+            self.log.info("LLM loaded successfully", class_name=llm.__class__.__name__)
+            return llm
+        except Exception as e:
+            self.log.error(f"Error loading LLM: {e}")
+            raise DocumentQueryingPortalException("Failed to load LLM", sys)
+    
+    def __get_session_history(self, session_id: str) -> BaseChatMessageHistory:
+        try:
+            if "store" not in st.session_state:
+                st.session_state.store = {}
+
+            if session_id not in st.session_state.store:
+                st.session_state.store[session_id] = ChatMessageHistory()
+
+            return st.session_state.store[session_id]
+
+        except Exception as e:
+            self.log.error(f"Error getting session history: {e}")
+            raise DocumentQueryingPortalException("Failed to get session history", sys)
+
+    
