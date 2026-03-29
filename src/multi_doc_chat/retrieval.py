@@ -3,6 +3,7 @@ import os
 
 from dotenv import load_dotenv
 from operator import itemgetter
+from typing import List, Optional
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import BaseMessage
@@ -37,6 +38,7 @@ class ConversationalRAG:
             raise DocumentQueryingPortalException("Initializing error in ConversationalRAG", sys)
 
     def load_retriever_from_faiss(self, index_path:str):
+        """Load a FAISS vector store from disk and convert to retriever"""
         try:
             embeddings = ModelLoader().load_embeddings()
             if not os.path.isdir(index_path):
@@ -57,11 +59,29 @@ class ConversationalRAG:
         except Exception as e:
             raise DocumentQueryingPortalException("Loading Error in ConversationalRAG", sys)
 
-    def invoke(self):
+    def invoke(self, user_input, chat_history: Optional[List[BaseMessage]] = None) -> str:
+        """
+        Args:
+            user_input (str): _description_
+            chat_history (Optional[List[BaseMessage]], optional): _description_. Defaults to None
+        """
         try:
-            pass
+            chat_history = chat_history or []
+            payload = {
+                "input": user_input,
+                "chat_history": chat_history
+            }
+            answer = self.chain.invoke(payload)
+
+            if not answer:
+                self.log.warning("Empty answer received", session_id= self.session_id)
+                return "No answer generated"
+            
+            self.log.info("Chain invoked successfully", session_id=self.session_id, user_input=user_input, answer_previous=answer[:150])
+            return answer
         except Exception as e:
-            raise DocumentQueryingPortalException("Invoking Error in ConversationalRAG", sys)
+            self.log.error(f"Error invoking conversational retrieval: {e}")
+            raise DocumentQueryingPortalException("Failed to invoke in ConversationalRAG", sys) 
 
     @staticmethod
     def format_docs(docs):
@@ -69,10 +89,18 @@ class ConversationalRAG:
 
     def __build_lcel_chain(self):
         try:
-            retrieve_docs = self.retriever | RunnablePassthrough(
-                input_key = "input",
-                output_key = "context"
+            question_rewriter = (
+                { "input": itemgetter("input"), "chat_history": itemgetter("chat_history")}
+                | self.contextualize_prompt
+                | self.llm
+                | StrOutputParser()
             )
+
+            retrieve_docs = question_rewriter | self.retriever | self.format_docs
+            # retrieve_docs = self.retriever | RunnablePassthrough(
+            #     input_key = "input",
+            #     output_key = "context"
+            # )
             self.chain = (
                 {
                     "context": retrieve_docs,
