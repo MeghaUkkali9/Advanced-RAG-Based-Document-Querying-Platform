@@ -173,3 +173,6 @@ def test_document_ingetion_and_rag():
     except Exception as e:
         print(f"test failed: {str(e)}")
         sys.exit()
+
+if __name__ == "__main__":
+    test_document_ingetion_and_rag()

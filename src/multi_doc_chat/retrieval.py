@@ -7,7 +7,7 @@ from typing import List, Optional
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import BaseMessage
-from langchain_core.output_parser import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.vectorstores import FAISS
 
@@ -20,7 +20,7 @@ from model.models import PromptType
 class ConversationalRAG:
     def __init__(self, session_id:str, retriever=None):
         try:
-            self.log = CustomLogger.get_logger(__name__)
+            self.log = CustomLogger().get_logger(__name__)
             self.session_id = session_id
             self.llm = self.__load_llm()
             self.contextualize_prompt: ChatPromptTemplate = PROMPT_REGISTRY[PromptType.CONTEXTUALIZE_QUERY.value]
@@ -117,7 +117,7 @@ class ConversationalRAG:
 
     def __load_llm(self):
         try:
-            llm = ModelLoader.load_llm()
+            llm = ModelLoader().load_llm()
             if not llm:
                 raise ValueError("LLM could not be loaded")
             
@@ -125,6 +125,7 @@ class ConversationalRAG:
             return llm
         except Exception as e:
             raise DocumentQueryingPortalException("Invoking Error in ConversationalRAG", sys)
+            
 
 
 

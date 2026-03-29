@@ -15,12 +15,12 @@ from logger.custom_logger import CustomLogger
 from utils.model_loader import ModelLoader
 
 class DocumentIngestor:
-    SUPPORTED_FILE_TYPES = {'.pdf', '.docs', '.txt', '.md'}
+    SUPPORTED_FILE_TYPES = {'.pdf', '.docx', '.txt', '.md'}
 
     def __init__(self, temp_dir:str="data/multi_doc_chat", faiss_dir:str="faiss_index", sesssion_id:str=None):
+        self.log = CustomLogger().get_logger(__name__)
         try:
-            self.log = CustomLogger.get_logger(__name__)
-
+            
             #base dirs
             self.temp_dir = Path(temp_dir)
             self.temp_dir.mkdir(parents=True, exist_ok=True)
@@ -28,19 +28,19 @@ class DocumentIngestor:
             self.faiss_dir = Path(faiss_dir)
             self.faiss_dir.mkdir(parents=True, exist_ok=True)
 
-            self.sesssion_id = sesssion_id or f"session_id_{datetime.now().strftime("%Y%m%d_%H%M%S")}_{uuid.uuid4().hex[:8]}"
+            self.sesssion_id = sesssion_id or f"session_id_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
             
-            self.session_temp_dir = self.temp_dir / self.session_temp_dir
+            self.session_temp_dir = self.temp_dir / self.sesssion_id
             self.session_temp_dir.mkdir(parents=True, exist_ok=True)
 
-            self.session_faiss_dir = self.faiss_dir / self.session_faiss_dir
+            self.session_faiss_dir = self.faiss_dir / self.sesssion_id
             self.session_faiss_dir.mkdir(parents=True, exist_ok=True)
 
             self.model_loader = ModelLoader()
 
             self.log.info("Initializing is completed")
         except Exception as e:
-            self.log.info("Error in initializing DocumentIngestor", error = str(e))
+            self.log.error("Error in initializing DocumentIngestor")
             raise DocumentQueryingPortalException("Initialization error in DocumentIngestor", sys)
 
     def ingest_files(self, uploaded_files):
@@ -77,8 +77,8 @@ class DocumentIngestor:
                 if not documents:
                     raise DocumentQueryingPortalException("No Valid documents loaded", sys)
                 
-                self.log.info("All documents are loaded")
-                return self.__create_retriever(documents=documents)
+            self.log.info("All documents are loaded")
+            return self.__create_retriever(documents=documents)
         except Exception as e:
             self.log.info("Error while ingesting files in DocumentIngestor", error = str(e))
             raise DocumentQueryingPortalException("Couldn't ingest the files")
@@ -95,7 +95,7 @@ class DocumentIngestor:
 
             embeddings = self.model_loader.load_embeddings()
 
-            vector_store = FAISS.from_documents(documents=chunks, embeddings=embeddings)
+            vector_store = FAISS.from_documents(documents=chunks, embedding=embeddings)
 
             vector_store.save_local(str(self.session_faiss_dir))
             self.log.info("FAISS index created and saved", faiss_path= str(self.faiss_dir))
@@ -107,3 +107,5 @@ class DocumentIngestor:
         except Exception as e:
             self.log.info("Error while creating retriver in DocumentIngestor", error = str(e))
             raise DocumentQueryingPortalException("Couldn't ingest the files")
+        
+        
