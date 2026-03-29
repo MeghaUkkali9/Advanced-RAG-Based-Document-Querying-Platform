@@ -15,7 +15,7 @@ class ModelLoader:
     """
     def __init__(self):
         load_dotenv()
-        self._validate_env()
+        self.__validate_env()
         self.config = load_config()
 
         log.info(
@@ -23,7 +23,7 @@ class ModelLoader:
             config_keys=list(self.config.keys())
         )
 
-    def _validate_env(self):
+    def __validate_env(self):
         """
         Validate required environment variables for API keys."""
         required_env_vars = ["OPENAI_API_KEY", "GROQ_API_KEY"]
@@ -58,7 +58,8 @@ class ModelLoader:
                     model=model_name,
                     api_key=self.api_keys["OPENAI_API_KEY"]
                 )
-
+            elif provider == "groq":
+                raise ValueError("Groq embeddings not supported")
             else:
                 raise ValueError(f"Unsupported embedding provider: {provider}")
 
