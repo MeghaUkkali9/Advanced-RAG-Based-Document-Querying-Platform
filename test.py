@@ -164,7 +164,7 @@ def test_document_ingetion_and_rag():
             f.close()
         session_id = "test_multi_doc_chat"
         rag = ConversationalRAG(session_id=session_id, retriever=ingested_retriever)
-        question = "what is attention is all you need paper about?"
+        question = "what is all abount NLP for smart healthcare?"
 
         answer = rag.invoke(question)
         print("\n Question:", question)
