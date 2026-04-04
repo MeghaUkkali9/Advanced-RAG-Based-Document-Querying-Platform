@@ -4,7 +4,7 @@ packages = [
     "python-dotenv",
     "ipykernel",
     "langchain-openai"
-    "langchain_groq",
+    "langchain-groq",
     "langchain_google_genai",
     "langchain-community",
     "faiss-cpu",

@@ -88,8 +88,8 @@
 # from pathlib import Path
 
 # from langchain_community.vectorstores import FAISS
-# from src.single_chat_doc.data_ingestion import SingleDocIngestor
-# from src.single_chat_doc.retrieval import ConversationalRetrieval
+# from src.single_document_chat.data_ingestion import SingleDocIngestor
+# from src.single_document_chat.retrieval import ConversationalRetrieval
 # from utils.model_loader import ModelLoader
 
 # FAISS_INDEX_PATH = Path("faiss_index")
@@ -97,6 +97,7 @@
 # def test_convertaional_rag_on_pdf(pdf_path, question):
 #     try:
 #         model_loader = ModelLoader()
+       
 #         if FAISS_INDEX_PATH.exists():
 #             print("Loading existing FAISS index")
 #             embeddings = model_loader.load_embeddings()
@@ -162,6 +163,7 @@ def test_document_ingetion_and_rag():
         
         for f in uploaded_files:
             f.close()
+            
         session_id = "test_multi_doc_chat"
         rag = ConversationalRAG(session_id=session_id, retriever=ingested_retriever)
         question = "what is all abount NLP for smart healthcare?"

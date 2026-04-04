@@ -23,31 +23,12 @@ class ModelLoader:
             config_keys=list(self.config.keys())
         )
 
-    def __validate_env(self):
-        """
-        Validate required environment variables for API keys."""
-        required_env_vars = ["OPENAI_API_KEY", "GROQ_API_KEY"]
-
-        self.api_keys = {key: os.getenv(key) for key in required_env_vars}
-
-        missing_vars = [k for k, v in self.api_keys.items() if not v]
-
-        if missing_vars:
-            log.error(f"Missing env vars: {missing_vars}")
-            raise DocumentQueryingPortalException(
-                f"Missing required env vars: {missing_vars}",
-                sys
-            )
-
-        log.info("Environment variables validated")
-
     def load_embeddings(self):
         """
         Load embeddings based on YAML config.
         """
         try:
             emb_config = self.config["embedding_model"]
-
             model_name = emb_config["model_name"]
             provider = emb_config["provider"]
 
@@ -112,6 +93,26 @@ class ModelLoader:
         except Exception as e:
             log.error(f"LLM load failed: {e}")
             raise DocumentQueryingPortalException(e, sys)
+        
+    def __validate_env(self):
+        """
+        Validate required environment variables for API keys.
+        """
+        required_env_vars = ["OPENAI_API_KEY", "GROQ_API_KEY"]
+
+        self.api_keys = {key: os.getenv(key) for key in required_env_vars}
+
+        missing_vars = [k for k, v in self.api_keys.items() if not v]
+
+        if missing_vars:
+            log.error(f"Missing env vars: {missing_vars}")
+            raise DocumentQueryingPortalException(
+                f"Missing required env vars: {missing_vars}",
+                sys
+            )
+
+        log.info("Environment variables validated")
+
 
 # if __name__ == "__main__":
 #     loader = ModelLoader()
