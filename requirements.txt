@@ -17,4 +17,7 @@ streamlit==1.47.1
 pytest==8.4.1
 pypdf==5.8.0
 cfn-lint
+fastapi==0.116.1
+uvicorn==0.35.0
+python-multipart==0.0.20
 -e .
