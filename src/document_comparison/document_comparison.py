@@ -13,7 +13,7 @@ from langchain.output_parsers import OutputFixingParser
 
 log = CustomLogger().get_logger(__name__)
 
-class DocumentComparator:
+class DocumentComparatorLLM:
     def __init__(self):
         load_dotenv()
         log.info("Initializing DocumentComparator...")
