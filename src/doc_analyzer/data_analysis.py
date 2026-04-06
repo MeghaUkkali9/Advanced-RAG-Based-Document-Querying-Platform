@@ -8,7 +8,7 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain.output_parsers import OutputFixingParser
 from prompt.prompt_library import PROMPT_REGISTRY
 
-class DataAnalyzer:
+class DocumentAnalyzer:
     """
     Analyzes documents using a pre-trained model and parses the output.
     """ 

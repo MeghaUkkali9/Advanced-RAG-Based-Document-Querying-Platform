@@ -36,3 +36,6 @@ This folder stores metadata about the project, such as:
 
 This metadata helps pip and Python manage the package including installation, dependency tracking, and uninstallation.
 
+To run this application: uvicorn api.main:app --reload
+uvicorn is server to run an application.
+
