@@ -41,7 +41,7 @@ class FaissManager:
         self.embeddings = self.model_loader.load_embeddings()
         self.vector_store: Optional[FAISS] = None
 
-    def load_or_create(self,texts: Optional[List[str]]=None, metadatas: Optional[List[dict]] = None):
+    def load_or_create(self,texts: Optional[List[str]]=None, metadata: Optional[List[dict]] = None):
         if self.__exists():
             self.vector_store = FAISS.load_local(
                 str(self.index_dir),
@@ -53,7 +53,7 @@ class FaissManager:
         if not texts:
             raise DocumentQueryingPortalException("No existing FAISS index and no data to create one", sys)
         
-        self.vector_store = FAISS.from_texts(texts=texts, embedding=self.embeddings, metadatas=metadatas or [])
+        self.vector_store = FAISS.from_texts(texts=texts, embedding=self.embeddings, metadata=metadata or [])
         self.vector_store.save_local(str(self.index_dir))
         
         return self.vector_store
@@ -223,16 +223,24 @@ class DocumentIngestor:
         session_id: Optional[str] = None,
     ):
         try:
+            self.log = CustomLogger().get_logger()
             self.model_loader = ModelLoader()
             
             self.use_session = use_session_dirs
             self.session_id = session_id or generate_session_id()
             
-            self.temp_base = Path(temp_base); self.temp_base.mkdir(parents=True, exist_ok=True)
-            self.faiss_base = Path(faiss_base); self.faiss_base.mkdir(parents=True, exist_ok=True)
+            self.temp_base = Path(temp_base); 
+            self.temp_base.mkdir(parents=True, exist_ok=True)
+            
+            self.faiss_base = Path(faiss_base); 
+            self.faiss_base.mkdir(parents=True, exist_ok=True)
             
             self.temp_dir = self.__resolve_dir(self.temp_base)
             self.faiss_dir = self.__resolve_dir(self.faiss_base)
+            
+            self.log.info("Document Ingestor Initialized:", session_id=self.session_id, 
+                          temp_dir=str(self.temp_dir),
+                          faiss_dir=str(self.faiss_dir))
 
         except Exception as e:
             raise DocumentQueryingPortalException("Initialization error in ChatIngestor", e)
@@ -246,9 +254,11 @@ class DocumentIngestor:
         
     def __split(self, docs: List[Document], chunk_size=1000, chunk_overlap=200) -> List[Document]:
         splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-        return splitter.split_documents(docs)
+        chunks = splitter.split_documents(docs)
+        self.log.info("Document split", chunk_size=len(chunks), chunk_overlap=chunk_overlap)
+        return chunks
     
-    def built_retriver( 
+    def build_retriver( 
         self,
         uploaded_files: Iterable,
         *,
@@ -266,9 +276,9 @@ class DocumentIngestor:
             faiss_manager = FaissManager(self.faiss_dir, self.model_loader)
             
             texts = [chunk.page_content for chunk in chunks]
-            metas = [chunk.metadata for chunk in chunks]
+            metadata = [chunk.metadata for chunk in chunks]
             
-            vector_store = faiss_manager.load_or_create(texts=texts, metadatas=metas)
+            vector_store = faiss_manager.load_or_create(texts=texts, metadata=metadata)
                 
             added = faiss_manager.add_documents(chunks)
             
