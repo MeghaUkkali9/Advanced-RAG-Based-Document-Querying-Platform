@@ -7,13 +7,13 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from api.file_adapter import FastAPIFileAdapter
+from utils.file_adapter import FastAPIFileAdapter
 from logger import GLOBAL_LOGGER as log
 
 from langchain_community.vectorstores import FAISS
 from src.document_ingestion.document_ingestion import (
     DocumentHandler,
-    DocuementComparator,
+    DocumentComparator,
     DocumentIngestor,
     FaissManager
     )
@@ -55,13 +55,11 @@ async def health() -> Dict[str, str]:
     return {"status": "ok", "service": "Document Querying Platform"}
 
 def __read_pdf_handler(handler: DocumentHandler, path:str) -> str:
-    """
-    Helper function to read PDF using DocHandler
-    """
-    try:
-        pass
-    except Exception as e:
-        raise HTTPException(status_code=500, details=f"Error reading PDF:{str(e)}")
+    if hasattr(handler, "read_pdf"):
+        return handler.read_pdf(path)
+    if hasattr(handler, "read_"):
+        return handler.read_(path)
+    raise RuntimeError("Document Handler has neither read_pdf nor read_ method")
     
 @app.post("/analyze")
 async def analyze_document(file: UploadFile = File(...)) -> Any:
@@ -85,7 +83,7 @@ async def compare_documents(
     actual: UploadFile = File(...)
 ) -> Any:
     try:
-        doc_compare = DocuementComparator()
+        doc_compare = DocumentComparator()
         ref_path, act_path = doc_compare.save_uploaded_files(
             FastAPIFileAdapter(reference),
             FastAPIFileAdapter(actual))
@@ -123,7 +121,7 @@ async def chat_build_index(
             session_id=session_id or None,
         )
        
-        ci.built_retriver(
+        ci.build_retriver(
             wrapped, chunk_size=chunk_size, chunk_overlap=chunk_overlap, k=k
         )
         
