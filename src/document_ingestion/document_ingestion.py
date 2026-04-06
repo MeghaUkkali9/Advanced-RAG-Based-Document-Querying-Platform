@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import sys
 import json
@@ -7,13 +9,12 @@ import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Iterable, List, Optional, Dict, Any
-from __future__ import annotations
 
 import fitz
 from langchain.schema import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader
-from langchain_community.vectorstore import FAISS
+from langchain_community.vectorstores import FAISS
 
 from utils.model_loader import ModelLoader
 from logger.custom_logger import CustomLogger
@@ -53,7 +54,12 @@ class FaissManager:
         if not texts:
             raise DocumentQueryingPortalException("No existing FAISS index and no data to create one", sys)
         
-        self.vector_store = FAISS.from_texts(texts=texts, embedding=self.embeddings, metadata=metadata or [])
+        self.vector_store = FAISS.from_texts(
+            texts=texts, 
+            embedding=self.embeddings, 
+            metadata=metadata or []
+            )
+        
         self.vector_store.save_local(str(self.index_dir))
         
         return self.vector_store
