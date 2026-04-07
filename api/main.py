@@ -44,7 +44,9 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    response = templates.TemplateResponse("index.html", {"request": request})
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.get("/health")
