@@ -42,7 +42,7 @@ class FaissManager:
         self.embeddings = self.model_loader.load_embeddings()
         self.vector_store: Optional[FAISS] = None
 
-    def load_or_create(self,texts: Optional[List[str]]=None, metadata: Optional[List[dict]] = None):
+    def load_or_create(self,texts: Optional[List[str]]=None, metadatas: Optional[List[dict]] = None):
         if self.__exists():
             self.vector_store = FAISS.load_local(
                 str(self.index_dir),
@@ -57,7 +57,7 @@ class FaissManager:
         self.vector_store = FAISS.from_texts(
             texts=texts, 
             embedding=self.embeddings, 
-            metadata=metadata or []
+            metadatas=metadatas or []
             )
         
         self.vector_store.save_local(str(self.index_dir))
@@ -282,9 +282,9 @@ class DocumentIngestor:
             faiss_manager = FaissManager(self.faiss_dir, self.model_loader)
             
             texts = [chunk.page_content for chunk in chunks]
-            metadata = [chunk.metadata for chunk in chunks]
+            metadatas = [chunk.metadata for chunk in chunks]
             
-            vector_store = faiss_manager.load_or_create(texts=texts, metadata=metadata)
+            vector_store = faiss_manager.load_or_create(texts=texts, metadatas=metadatas)
                 
             added = faiss_manager.add_documents(chunks)
             

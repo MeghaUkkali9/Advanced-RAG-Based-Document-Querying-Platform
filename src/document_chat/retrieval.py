@@ -3,7 +3,7 @@ import os
 
 from dotenv import load_dotenv
 from operator import itemgetter
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import BaseMessage
@@ -26,33 +26,48 @@ class ConversationalRAG:
             self.contextualize_prompt: ChatPromptTemplate = PROMPT_REGISTRY[PromptType.CONTEXTUALIZE_QUERY.value]
             self.qa_prompt : ChatPromptTemplate = PROMPT_REGISTRY[PromptType.CONTEXT_QUERY_ANSWERING.value]
 
-            if retriever is None:
-                raise ValueError("retreiver is not assigned")
-            
             self.retriever = retriever
-            self.__build_lcel_chain()
-
+            self.chain = None
+            
             self.log.info("Initialized ConversationalRAG")
         except Exception as e:
             self.log.info("Error while initializing", e)
             raise DocumentQueryingPortalException("Initializing error in ConversationalRAG", sys)
 
-    def load_retriever_from_faiss(self, index_path:str):
-        """Load a FAISS vector store from disk and convert to retriever"""
+    def load_retriever_from_faiss(
+        self, 
+        index_path:str,
+        k: int = 5,
+        index_name: str = "index",
+        search_type: str = "similarity",
+        search_kwargs: Optional[Dict[str, Any]] = None):
+        """
+        Load a FAISS vector store from disk and convert to retriever
+        """
         try:
-            embeddings = ModelLoader().load_embeddings()
             if not os.path.isdir(index_path):
                 raise FileNotFoundError(f"FAISS index directory not found: {index_path}")
+            
+            embeddings = ModelLoader().load_embeddings()
             
             vector_store = FAISS.load_local(
                 index_path,
                 embeddings,
+                index_name = index_name,
                 allow_dangerous_deserialization=True
             )
 
-            self.retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k":5})
+            if search_kwargs is None:
+                search_kwargs = {"k": k}
+                
+            self.retriever = vector_store.as_retriever(
+                search_type= search_type, 
+                search_kwargs= search_kwargs
+                )
             self.log.info("FAISS retriever loaded successfully", index_path=index_path, session_id=self.session_id)
-
+            
+            self.__build_lcel_chain()
+            
             return self.retriever
         
         except Exception as e:
@@ -65,6 +80,9 @@ class ConversationalRAG:
             chat_history (Optional[List[BaseMessage]], optional): _description_. Defaults to None
         """
         try:
+            if self.chain is None:
+                raise ValueError("Chain not initialized. Call load_retriever_from_faiss first.")
+
             chat_history = chat_history or []
             payload = {
                 "input": user_input,
@@ -88,6 +106,9 @@ class ConversationalRAG:
 
     def __build_lcel_chain(self):
         try:
+            if self.retriever is None:
+                raise ValueError("Retriever not initialized. Cannot build chain.")
+
             question_rewriter = (
                 { "input": itemgetter("input"), "chat_history": itemgetter("chat_history")}
                 | self.contextualize_prompt
