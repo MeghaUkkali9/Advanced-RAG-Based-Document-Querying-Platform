@@ -42,9 +42,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
-# app.mount("/static", StaticFiles(directory="../static"), name="static")
-# templates = Jinja2Templates(directory="../templates")
-
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
