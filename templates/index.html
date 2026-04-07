@@ -223,10 +223,29 @@
         tbody.innerHTML = `<tr><td colspan="2" class="muted center">No differences found.</td></tr>`;
         return;
       }
+      function formatList(arr) {
+        if (!arr || arr.length === 0) return "<span class='muted'>None</span>";
+        return `<ul style="margin:4px 0; padding-left:18px;">
+                  ${arr.map(item => `<li>${item}</li>`).join("")}
+                </ul>`;
+      }
+
       tbody.innerHTML = rows.map(r => {
-        const page = r.Page ?? r.page ?? "";
-        const chg  = r.Changes ?? r.changes ?? "";
-        return `<tr><td>${page}</td><td>${chg}</td></tr>`;
+        return `
+          <tr>
+            <td>${String(r.Page ?? "")}</td>
+            <td>
+              <div>
+                <span style="color:green; font-weight:600;">Added:</span>
+                ${formatList(r.added)}
+              </div>
+              <div style="margin-top:8px;">
+                <span style="color:red; font-weight:600;">Deleted:</span>
+                ${formatList(r.deleted)}
+              </div>
+            </td>
+          </tr>
+        `;
       }).join("");
     } catch (e) {
       tbody.innerHTML = `<tr><td colspan="2" class="muted center">Error: ${e.message || e}</td></tr>`;
