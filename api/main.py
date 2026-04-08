@@ -10,12 +10,10 @@ from fastapi.templating import Jinja2Templates
 from utils.file_adapter import FastAPIFileAdapter
 from logger import GLOBAL_LOGGER as log
 
-from langchain_community.vectorstores import FAISS
 from src.document_ingestion.document_ingestion import (
     DocumentHandler,
     DocumentComparator,
-    DocumentIngestor,
-    FaissManager
+    DocumentIngestor
     )
 from src.doc_analyzer.data_analysis import DocumentAnalyzer
 from src.document_comparison.document_comparison import DocumentComparatorLLM
@@ -44,7 +42,9 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    response = templates.TemplateResponse("index.html", {"request": request})
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.get("/health")

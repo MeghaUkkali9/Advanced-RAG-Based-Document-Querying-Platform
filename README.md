@@ -40,3 +40,7 @@ To run this application:
 uvicorn api.main:app --reload, uvicorn api.main:app --port 8080 --reload
 uvicorn is server to run an application.
 
+Build Docker image:
+docker build -t rag-based-document-portal .
+
+
