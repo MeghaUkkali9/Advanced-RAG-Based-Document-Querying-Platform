@@ -41,9 +41,11 @@ uvicorn api.main:app --reload, uvicorn api.main:app --port 8080 --reload
 uvicorn is server to run an application.
 
 Build Docker image:
-docker build -t rag-based-document-portal .
+                    docker build -t rag-based-document-portal .
 
+Run docker container: 
+                    docker run -d -p 8093:8080 --name rag-doc-portal rag-based-document-portal
 
-Run docker container: docker run -d -p 8093:8080 --name rag-doc-portal rag-based-document-portal
+Access swagger page: 
+                    http://localhost:8093/docs
 
-Access swagger page: http://localhost:8093/docs
