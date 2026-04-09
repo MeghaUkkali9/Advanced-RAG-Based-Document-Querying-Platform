@@ -8,7 +8,7 @@ def client():
     return TestClient(app)
 
 # -----------------------------
-# ✅ BASIC ENDPOINTS
+# BASIC ENDPOINTS
 # -----------------------------
 
 def test_health(client):
@@ -25,7 +25,7 @@ def test_home_ui(client):
 
 
 # -----------------------------
-# 📄 ANALYZE ENDPOINT (MOCKED)
+# ANALYZE ENDPOINT(MOCKED)
 # -----------------------------
 
 def test_analyze_document(client, monkeypatch):
@@ -56,7 +56,7 @@ def test_analyze_document(client, monkeypatch):
 
 
 # -----------------------------
-# 📊 COMPARE ENDPOINT (MOCKED)
+# COMPARE ENDPOINT
 # -----------------------------
 
 def test_compare_documents(client, monkeypatch):
@@ -96,7 +96,7 @@ def test_compare_documents(client, monkeypatch):
 
 
 # -----------------------------
-# 💬 CHAT INDEX (MOCKED)
+# CHAT INDEX (MOCKED)
 # -----------------------------
 
 def test_chat_index(client, monkeypatch):
@@ -124,7 +124,7 @@ def test_chat_index(client, monkeypatch):
 
 
 # -----------------------------
-# 💬 CHAT QUERY (MOCKED)
+# CHAT QUERY (MOCKED)
 # -----------------------------
 
 def test_chat_query(client, monkeypatch):
