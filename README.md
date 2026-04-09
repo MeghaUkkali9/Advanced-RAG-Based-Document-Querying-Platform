@@ -49,3 +49,5 @@ Run docker container:
 Access swagger page: 
                     http://localhost:8093/docs
 
+To Run tests: pytest tests/unit_tests.py -v
+
