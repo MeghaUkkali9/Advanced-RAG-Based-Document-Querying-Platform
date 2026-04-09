@@ -51,3 +51,22 @@ Access swagger page:
 
 To Run tests: pytest tests/unit_tests.py -v
 
+##Setup Pre hook 
+cd ~/Documents/Advanced-RAG-Based-Document-Querying-Platform
+
+touch .git/hooks/pre-push
+chmod +x .git/hooks/pre-push
+
+nano .git/hooks/pre-push
+
+#!/bin/bash
+
+echo "Running tests before push..."
+
+PYTHONPATH=. pytest tests/
+if [ $? -ne 0 ]; then
+  echo "Tests failed. Push aborted."
+  exit 1
+fi
+
+echo "Tests passed. Proceeding with push..."
