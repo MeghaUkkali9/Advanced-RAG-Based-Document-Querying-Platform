@@ -7,10 +7,6 @@ from api.main import app
 def client():
     return TestClient(app)
 
-# -----------------------------
-# BASIC ENDPOINTS
-# -----------------------------
-
 def test_health(client):
     res = client.get("/health")
     assert res.status_code == 200
@@ -22,11 +18,6 @@ def test_home_ui(client):
     assert res.status_code == 200
     assert "text/html" in res.headers["content-type"]
     assert "Document Portal" in res.text
-
-
-# -----------------------------
-# ANALYZE ENDPOINT(MOCKED)
-# -----------------------------
 
 def test_analyze_document(client, monkeypatch):
     class MockHandler:
@@ -53,11 +44,6 @@ def test_analyze_document(client, monkeypatch):
 
     assert res.status_code == 200
     assert res.json()["summary"] == "ok"
-
-
-# -----------------------------
-# COMPARE ENDPOINT
-# -----------------------------
 
 def test_compare_documents(client, monkeypatch):
     class MockComparator:
@@ -94,11 +80,6 @@ def test_compare_documents(client, monkeypatch):
     assert "rows" in res.json()
     assert res.json()["session_id"] == "123"
 
-
-# -----------------------------
-# CHAT INDEX (MOCKED)
-# -----------------------------
-
 def test_chat_index(client, monkeypatch):
     class MockIngestor:
         session_id = "abc"
@@ -121,11 +102,6 @@ def test_chat_index(client, monkeypatch):
 
     assert res.status_code == 200
     assert res.json()["session_id"] == "abc"
-
-
-# -----------------------------
-# CHAT QUERY (MOCKED)
-# -----------------------------
 
 def test_chat_query(client, monkeypatch):
     class MockRAG:
