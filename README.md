@@ -70,3 +70,48 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Tests passed. Proceeding with push..."
+
+
+AWS Setup for CI/CD (ECR + GitHub Actions)
+1. Create ECR Repository
+
+Create an Amazon ECR repository to store your Docker images.
+
+Note down the repository name:
+
+ECR_REPOSITORY = documentportal
+
+After pushing your image, you will get an image URI like:
+
+<aws_account_id>.dkr.ecr.<region>.amazonaws.com/documentportal:latest
+
+Use this URI in deployment :
+
+ContainerDefinitions:
+  - Name: document-portal-container
+    Image: <ECR_IMAGE_URI>
+
+2. Create IAM User for GitHub Actions
+
+Create an IAM user to allow GitHub Actions to push images to ECR.
+
+Steps:
+Go to AWS IAM Console
+Create a new user (e.g., github-actions-user)
+Attach required permissions:
+AmazonEC2ContainerRegistryFullAccess (or scoped permissions for production)
+Generate:
+Access Key ID
+Secret Access Key
+
+3. Add Credentials to GitHub Secrets
+
+Go to your repository settings:
+
+GitHub repository secrets
+
+Then: Navigate to:
+
+Settings → Secrets and variables → Actions
+Click "New repository secret"
+Add the following secrets:
