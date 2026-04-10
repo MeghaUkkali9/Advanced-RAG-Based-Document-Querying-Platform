@@ -115,3 +115,11 @@ Then: Navigate to:
 Settings → Secrets and variables → Actions
 Click "New repository secret"
 Add the following secrets:
+
+Store API keys in AWS Secrets Manager. (OPEN_API_KEY, GROQ_API)
+
+Create an ECS cluster (Fargate or EC2).
+
+Create a task definition using your container configuration:
+
+https://ap-southeast-2.console.aws.amazon.com/ecs/v2/task-definitions/documentportaltd/1/containers
