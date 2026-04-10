@@ -29,7 +29,7 @@
       "secrets": [
         {
           "name": "API_KEYS",
-          "valueFrom": "arn:aws:secretsmanager:ap-southeast-2:718203020368:secret:api_keys-VkOMgL"
+          "valueFrom": "api_keys"
         }
       ],
       "logConfiguration": {
