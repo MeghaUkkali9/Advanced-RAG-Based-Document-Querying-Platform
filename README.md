@@ -123,3 +123,55 @@ Create an ECS cluster (Fargate or EC2).
 Create a task definition using your container configuration:
 
 https://ap-southeast-2.console.aws.amazon.com/ecs/v2/task-definitions/documentportaltd/1/containers
+
+
+
+ADD IAM ROLE:
+The ecsTaskExecutionRole allows ECS tasks to:
+
+                        Pull container images from ECR
+                        Send logs to CloudWatch
+                        Retrieve secrets from AWS Secrets Manager
+
+1.Go to IAM Console
+Open AWS Console
+Navigate to IAM (Identity and Access Management)
+Click Roles → Create role
+
+2.Select Trusted Entity:
+Choose: AWS service
+Service: Elastic Container Service
+Use case: Elastic Container Service Task
+
+3.Attach Permissions:
+Attach the following AWS-managed policy:
+            AmazonECSTaskExecutionRolePolicy
+4.Create TWO separate inline policies under the same role.
+Policy 1: AllowECSLogs
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowECSLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+🔵 Policy 2: AllowSecretsAccess
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowSecretsAccess",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:ap-southeast-2:459497895986:secret:api_keys-nZTtj8*"
+    }
+  ]
+}
