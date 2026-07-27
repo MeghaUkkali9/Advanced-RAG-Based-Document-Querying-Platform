@@ -1,4 +1,5 @@
 import os
+from threading import Lock
 from typing import Any, Dict, List, Optional
 from pathlib import Path
 
@@ -7,6 +8,7 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from utils.file_adapter import FastAPIFileAdapter
 from logger import GLOBAL_LOGGER as log
 
@@ -35,6 +37,12 @@ app.add_middleware(
 FAISS_BASE = os.getenv("FAISS_BASE", "faiss_index")
 UPLOAD_BASE = os.getenv("UPLOAD_BASE", "data")
 FAISS_INDEX_NAME = os.getenv("FAISS_INDEX_NAME", "index")
+
+# In-memory per-session chat history. Keyed by session_id, capped to bound memory growth.
+# Not persisted across process restarts and not shared across workers/replicas.
+MAX_HISTORY_MESSAGES = 20
+_session_histories: Dict[str, List[BaseMessage]] = {}
+_history_lock = Lock()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
@@ -146,10 +154,21 @@ async def chat_query(
         if not os.path.isdir(index_dir):
             raise HTTPException(status_code=404, detail=f"FAISS index not found at: {index_dir}")
 
+        with _history_lock:
+            chat_history = list(_session_histories.get(session_id, [])) if session_id else []
+
         rag = ConversationalRAG(session_id=session_id)
-        rag.load_retriever_from_faiss(index_dir, k=k, index_name=FAISS_INDEX_NAME) 
-        response = rag.invoke(question, chat_history=[])
+        rag.load_retriever_from_faiss(index_dir, k=k, index_name=FAISS_INDEX_NAME)
+        response = rag.invoke(question, chat_history=chat_history)
         log.info("Chat query handled successfully.")
+
+        if session_id:
+            with _history_lock:
+                history = _session_histories.setdefault(session_id, [])
+                history.append(HumanMessage(content=question))
+                history.append(AIMessage(content=response))
+                if len(history) > MAX_HISTORY_MESSAGES:
+                    del history[: len(history) - MAX_HISTORY_MESSAGES]
 
         return {
             "answer": response,
