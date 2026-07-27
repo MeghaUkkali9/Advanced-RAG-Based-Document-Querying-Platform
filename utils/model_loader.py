@@ -103,7 +103,7 @@ class ModelLoader:
 
         except Exception as e:
             log.error(f"Embedding load failed: {e}")
-            raise DocumentQueryingPortalException(e, sys)
+            raise DocumentQueryingPortalException(e, e) from e
 
     def load_llm(self):
         """
@@ -151,7 +151,7 @@ class ModelLoader:
 
         except Exception as e:
             log.error(f"LLM load failed: {e}")
-            raise DocumentQueryingPortalException(e, sys)
+            raise DocumentQueryingPortalException(e, e) from e
 
 # if __name__ == "__main__":
 #     loader = ModelLoader()

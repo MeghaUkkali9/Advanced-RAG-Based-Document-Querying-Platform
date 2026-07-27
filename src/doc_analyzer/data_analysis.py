@@ -1,5 +1,3 @@
-import os
-import sys
 from utils.model_loader import ModelLoader
 from logger.logger_instance import logger as log
 from exception.custom_exception import DocumentQueryingPortalException
@@ -26,7 +24,7 @@ class DocumentAnalyzer:
 
         except Exception as e:
             log.error(f"Error initializing DataAnalyzer: {e}")
-            raise DocumentQueryingPortalException("Failed to initialize DataAnalyzer", sys)
+            raise DocumentQueryingPortalException("Failed to initialize DataAnalyzer", e) from e
 
     def analyze_document(self, document_text: str) -> dict:
         try:
@@ -43,4 +41,4 @@ class DocumentAnalyzer:
         
         except Exception as e:
             log.error(f"Error analyzing document: {e}")
-            raise DocumentQueryingPortalException("Failed to analyze document", sys)
+            raise DocumentQueryingPortalException("Failed to analyze document", e) from e

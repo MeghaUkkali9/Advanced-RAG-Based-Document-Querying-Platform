@@ -1,4 +1,3 @@
-import sys
 from dotenv import load_dotenv
 import pandas as pd
 
@@ -44,7 +43,7 @@ class DocumentComparatorLLM:
             return self._format_response(response)
         except Exception as e:
             log.error(f"Error comparing documents: {e}")
-            raise DocumentQueryingPortalException("Failed to compare documents", sys)
+            raise DocumentQueryingPortalException("Failed to compare documents", e) from e
 
     def _format_response(self, response:list[dict]) -> pd.DataFrame:
         """Format the response from the LLM to be user-friendly."""
@@ -54,5 +53,5 @@ class DocumentComparatorLLM:
             return df
         except Exception as e:
             log.error(f"Error formatting response: {e}")
-            raise DocumentQueryingPortalException("Failed to format response", sys)
+            raise DocumentQueryingPortalException("Failed to format response", e) from e
 

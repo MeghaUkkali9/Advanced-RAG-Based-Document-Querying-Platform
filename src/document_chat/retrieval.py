@@ -1,4 +1,3 @@
-import sys
 import os
 
 from dotenv import load_dotenv
@@ -32,7 +31,7 @@ class ConversationalRAG:
             self.log.info("Initialized ConversationalRAG")
         except Exception as e:
             self.log.info("Error while initializing", e)
-            raise DocumentQueryingPortalException("Initializing error in ConversationalRAG", sys)
+            raise DocumentQueryingPortalException("Initializing error in ConversationalRAG", e) from e
 
     def load_retriever_from_faiss(
         self, 
@@ -56,7 +55,7 @@ class ConversationalRAG:
                 index_name = index_name,
                 allow_dangerous_deserialization=True
             )
-
+            
             if search_kwargs is None:
                 search_kwargs = {"k": k}
                 
@@ -71,7 +70,7 @@ class ConversationalRAG:
             return self.retriever
         
         except Exception as e:
-            raise DocumentQueryingPortalException("Loading Error in ConversationalRAG", sys)
+            raise DocumentQueryingPortalException("Loading Error in ConversationalRAG", e) from e
 
     def invoke(self, user_input, chat_history: Optional[List[BaseMessage]] = None) -> str:
         """
@@ -98,7 +97,7 @@ class ConversationalRAG:
             return answer
         except Exception as e:
             self.log.error(f"Error invoking conversational retrieval: {e}")
-            raise DocumentQueryingPortalException("Failed to invoke in ConversationalRAG", sys) 
+            raise DocumentQueryingPortalException("Failed to invoke in ConversationalRAG", e) from e
 
     @staticmethod
     def format_docs(docs):
@@ -134,7 +133,7 @@ class ConversationalRAG:
             
         except Exception as e:
             self.log.info("Failed to build LCEL Chain")
-            raise DocumentQueryingPortalException("LCEL Chain building Error in ConversationalRAG", sys)
+            raise DocumentQueryingPortalException("LCEL Chain building Error in ConversationalRAG", e) from e
 
     def __load_llm(self):
         try:
@@ -145,7 +144,7 @@ class ConversationalRAG:
             self.log.info("LLM is loaded successfully", session_id = self.session_id)
             return llm
         except Exception as e:
-            raise DocumentQueryingPortalException("Invoking Error in ConversationalRAG", sys)
+            raise DocumentQueryingPortalException("Invoking Error in ConversationalRAG", e) from e
             
 
 
