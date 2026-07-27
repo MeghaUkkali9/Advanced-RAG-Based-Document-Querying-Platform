@@ -26,7 +26,7 @@ def load_documents(paths: Iterable[Path]) -> List[Document]:
             elif ext == ".txt":
                 loader = TextLoader(str(path), encoding="utf-8")
             else:
-                log.warning("Unsupported extension skipped", path=str(p))
+                log.warning("Unsupported extension skipped", path=str(path))
                 continue
             
             docs.extend(loader.load())
