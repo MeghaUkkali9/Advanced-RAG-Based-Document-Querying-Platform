@@ -1,177 +1,93 @@
-# advanced-rag-document-querying-portal
+# Advanced RAG Based Document Querying Platform
 
-## Commands to be follwed:
+This is a document Q&A tool. You upload your documents, PDF, DOCX or TXT, and instead of reading the whole thing yourself you just ask questions and it answers based on what's actually in the document.
+
+## What it actually does
+
+In simple words this is what happens behind the scenes:
+
+1. You upload a document.
+2. The document gets split into small chunks since an LLM can't read a 200 page PDF in one go.
+3. Each chunk gets converted into an embedding, basically a bunch of numbers that represent the meaning of that text, and stored in a FAISS vector database.
+4. When you ask a question it finds the chunks that are most relevant to your question, then sends only those chunks plus your question to the LLM.
+5. The LLM answers using that context so the answer is grounded in your document instead of the model just making things up.
+
+This approach is called RAG, short for Retrieval Augmented Generation.
+
+## Features
+
+Chat with documents. Upload one or more PDFs, DOCX or TXT files and have a proper back and forth conversation about them. It remembers what you asked earlier in the same session.
+
+Analyze a document. Upload a single PDF and get a structured summary out of it.
+
+Compare documents. Upload two PDFs, like two versions of a contract, and get the differences between them.
+
+There's a simple web UI included, or you can just hit the API directly through the Swagger docs at `/docs`.
+
+## Tech stack
+
+FastAPI for the backend server. LangChain to wire up the LLM, retriever and prompts. FAISS as the vector database for storing document embeddings. OpenAI and Groq as the LLM providers, configurable in `config/config.yaml`. Docker to containerize the app. AWS ECR and ECS for deployment, details in `docs/deployment.md`.
+
+## Running it locally
+
+Create and activate the environment:
 ```
-conda create -n documentqueryingportal python = 3.10
-```
-```
+conda create -n documentqueryingportal python=3.10
 conda activate documentqueryingportal
 ```
 
-To install all packages required for this project:
+Install the dependencies:
+```
 pip install -r requirements.txt
+```
 
+### Why do we need setuptools
 
-What all should be having for this project
-1. LLM model: open ai, groq, gemini, claude, hugging face
-2. Embedding model: open ai, huggingface, gemini
-3. vector database: ##inmemory ##ondisk ##cloud-based db
-
-## why do we need setuptools
-We use the setuptools library to package our project as a Python package so it can be installed and imported like any other libraries.
+We use the setuptools library to package our project as a Python package so it can be installed and imported like any other library.
 
 When we run:
 ```
 pip install -e .
 ```
+pip uses setuptools to install the project. The `-e` means editable mode, or development mode. Instead of copying the code, Python creates a link to the project directory. During this process setuptools creates a `.egg-info` folder.
 
-pip uses setuptools to install the project. The -e means editable mode (development mode). Instead of copying the code, Python creates a link to the project directory. During this process, setuptools creates a .egg-info folder.
-
-This folder stores metadata about the project, such as:
-
+This folder stores metadata about the project such as:
 1. project name
 2. version
 3. dependencies
 4. author
 
-This metadata helps pip and Python manage the package including installation, dependency tracking, and uninstallation.
+This metadata helps pip and Python manage the package, including installation, dependency tracking and uninstallation.
 
-To run this application: 
-uvicorn api.main:app --reload, uvicorn api.main:app --port 8080 --reload
-uvicorn is server to run an application.
+### Run the app
 
-Build Docker image:
-                    docker build -t rag-based-document-portal .
+```
+uvicorn api.main:app --reload
+```
+uvicorn is the server that actually runs the FastAPI app. Once it's running open `http://localhost:8000` for the UI or `http://localhost:8000/docs` for the API.
 
-Run docker container: 
-                    docker run -d -p 8093:8080 --name rag-doc-portal rag-based-document-portal
+### Run with Docker
 
-Access swagger page: 
-                    http://localhost:8093/docs
+Build the image:
+```
+docker build -t rag-based-document-portal .
+```
 
-To Run tests: pytest tests/unit_tests.py -v
+Run the container:
+```
+docker run -d -p 8093:8080 --name rag-doc-portal rag-based-document-portal
+```
 
-##Setup Pre hook 
-cd ~/Documents/Advanced-RAG-Based-Document-Querying-Platform
+Then open `http://localhost:8093/docs` for the Swagger page.
 
-touch .git/hooks/pre-push
-chmod +x .git/hooks/pre-push
+### Run tests
 
-nano .git/hooks/pre-push
+```
+pytest tests/ -v
+```
 
-#!/bin/bash
+There's also a pre-push git hook set up that runs the tests automatically before every push so a broken build doesn't accidentally get pushed. Setup details are in `docs/deployment.md`.
 
-echo "Running tests before push..."
+## Deployment
 
-PYTHONPATH=. pytest tests/
-if [ $? -ne 0 ]; then
-  echo "Tests failed. Push aborted."
-  exit 1
-fi
-
-echo "Tests passed. Proceeding with push..."
-
-
-AWS Setup for CI/CD (ECR + GitHub Actions)
-1. Create ECR Repository
-
-Create an Amazon ECR repository to store your Docker images.
-
-Note down the repository name:
-
-ECR_REPOSITORY = documentportal
-
-After pushing your image, you will get an image URI like:
-
-<aws_account_id>.dkr.ecr.<region>.amazonaws.com/documentportal:latest
-
-Use this URI in deployment :
-
-ContainerDefinitions:
-  - Name: document-portal-container
-    Image: <ECR_IMAGE_URI>
-
-2. Create IAM User for GitHub Actions
-
-Create an IAM user to allow GitHub Actions to push images to ECR.
-
-Steps:
-Go to AWS IAM Console
-Create a new user (e.g., github-actions-user)
-Attach required permissions:
-AmazonEC2ContainerRegistryFullAccess (or scoped permissions for production)
-Generate:
-Access Key ID
-Secret Access Key
-
-3. Add Credentials to GitHub Secrets
-
-Go to your repository settings:
-
-GitHub repository secrets
-
-Then: Navigate to:
-
-Settings → Secrets and variables → Actions
-Click "New repository secret"
-Add the following secrets:
-
-Store API keys in AWS Secrets Manager. (OPEN_API_KEY, GROQ_API)
-
-Create an ECS cluster (Fargate or EC2).
-
-Create a task definition using your container configuration:
-
-https://ap-southeast-2.console.aws.amazon.com/ecs/v2/task-definitions/documentportaltd/1/containers
-
-
-
-ADD IAM ROLE:
-The ecsTaskExecutionRole allows ECS tasks to:
-
-                        Pull container images from ECR
-                        Send logs to CloudWatch
-                        Retrieve secrets from AWS Secrets Manager
-
-1.Go to IAM Console
-Open AWS Console
-Navigate to IAM (Identity and Access Management)
-Click Roles → Create role
-
-2.Select Trusted Entity:
-Choose: AWS service
-Service: Elastic Container Service
-Use case: Elastic Container Service Task
-
-3.Attach Permissions:
-Attach the following AWS-managed policy:
-            AmazonECSTaskExecutionRolePolicy
-4.Create TWO separate inline policies under the same role.
-Policy 1: AllowECSLogs
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "AllowECSLogs",
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-🔵 Policy 2: AllowSecretsAccess
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "AllowSecretsAccess",
-      "Effect": "Allow",
-      "Action": "secretsmanager:GetSecretValue",
-      "Resource": "arn:aws:secretsmanager:ap-southeast-2:459497895986:secret:api_keys-nZTtj8*"
-    }
-  ]
-}
+This app is deployed on AWS using ECR and ECS through GitHub Actions. The full setup, IAM roles, secrets, task definitions, is written up separately in `docs/deployment.md` so this README stays focused on what the project is and how to run it.
